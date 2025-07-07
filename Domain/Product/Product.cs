@@ -5,10 +5,10 @@ using Domain.Product.ValueObjects;
 
 public class Product : AuditableEntity<Guid>, IAggregateRoot
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public string? Description { get; private set; }
-    public ProductImage Image { get; private set; }
-    public Money Price { get; private set; }
+    public ProductImage? Image { get; private set; }
+    public Money Price { get; private set; } = default!;
 
     public Guid BrandId { get; private set; }
     public Guid CategoryId { get; private set; }
@@ -18,7 +18,7 @@ public class Product : AuditableEntity<Guid>, IAggregateRoot
 
     private Product() { }
 
-    public static Product Create(string name, string? description, ProductImage image, Money price, Guid brandId, Guid categoryId, int initialStock = 0)
+    public static Product Create(string name, string? description, ProductImage? image, Money price, Guid brandId, Guid categoryId, int initialStock = 0)
     {
         ValidateName(name);
         ValidatePrice(price);
