@@ -23,6 +23,9 @@ public class Product : AuditableEntity<Guid>, IAggregateRoot
         ValidateName(name);
         ValidatePrice(price);
 
+        var defaultImage = ProductImage.Of("https://default/image.png");
+        var finalImage = image ?? defaultImage;
+
         var product = new Product
         {
             Id = Guid.NewGuid(),

@@ -10,10 +10,17 @@ public class ProductImage : ValueObject
 {
     public string Url { get; }
 
-    public ProductImage(string url)
+    private ProductImage(string url)
     {
-        if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("Image URL cannot be empty");
         Url = url;
+    }
+
+    public static ProductImage Of(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException("Image URL cannot be empty.", nameof(url));
+
+        return new ProductImage(url);
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

@@ -41,10 +41,9 @@ public class CreateProductHandler(IApplicationDbContext context)
         //if (!categoryExists)
         //    throw new ArgumentException($"Category with Id {request.CategoryId} not found.");
 
-        var price = new Money(request.Price);
+        Money price = Money.Of(request.Price);
         ProductImage? image = string.IsNullOrWhiteSpace(request.ImageUrl)
-            ? null
-            : new ProductImage(request.ImageUrl);
+            ? null : ProductImage.Of(request.ImageUrl);
 
         var product = Product.Create(
              request.Name,
