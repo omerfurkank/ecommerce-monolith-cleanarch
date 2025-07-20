@@ -1,13 +1,11 @@
 ﻿namespace Domain.Common;
 
-public abstract class Entity<TId>
+public abstract class Entity
 {
-    public TId Id { get; protected set; }
+    public Guid Id { get; protected set; }
 
     private readonly List<DomainEvent> _domainEvents = new();
     public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
-
-    protected Entity() { }
 
     #region Domain Events
 

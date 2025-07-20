@@ -1,9 +1,4 @@
-﻿using Domain.Common;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
-namespace Infrastructure.Data.Interceptors;
+﻿namespace Infrastructure.Data.Interceptors;
 public class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesInterceptor
 {
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
@@ -20,7 +15,7 @@ public class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesIn
         if (context == null) return;
 
         var aggregates = context.ChangeTracker
-            .Entries<Entity<Guid>>()
+            .Entries<Entity>()
             .Where(e => e.Entity.DomainEvents.Any())
             .Select(e => e.Entity)
             .ToList();

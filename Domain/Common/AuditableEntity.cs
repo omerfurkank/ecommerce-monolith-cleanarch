@@ -1,11 +1,12 @@
 ﻿namespace Domain.Common;
 
-public abstract class AuditableEntity<TId> : Entity<TId>, IAuditableEntity
-    where TId : notnull
+public abstract class AuditableEntity : Entity, IAuditableEntity
 {
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public string? CreatedBy { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public Guid CreatedBy { get; set; }
 
-    public DateTime? UpdatedAt { get; set; }
-    public string? UpdatedBy { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+    public Guid? UpdatedBy { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
 }

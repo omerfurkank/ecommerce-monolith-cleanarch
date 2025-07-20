@@ -1,9 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Infrastructure.Data;
+﻿using Infrastructure.Data;
 using Infrastructure.Data.Interceptors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure;
 

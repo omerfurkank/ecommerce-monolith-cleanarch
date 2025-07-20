@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Behaviors - Copy %283%29\" />
-    <Folder Include="Common\Behaviors - Copy %284%29\" />
-    <Folder Include="Common\Behaviors - Copy %285%29\" />
+    <Folder Include="Common\Interfaces\Data\" />
     <Folder Include="Products\Queries\" />
   </ItemGroup>
 

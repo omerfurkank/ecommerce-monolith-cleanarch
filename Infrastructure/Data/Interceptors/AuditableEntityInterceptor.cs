@@ -1,11 +1,9 @@
-﻿using Domain.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Common.Interfaces;
+using Domain.Product.Enums;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
 namespace Infrastructure.Data.Interceptors;
 
-public class AuditableEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditableEntityInterceptor(IUserContext userContext) : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
@@ -18,7 +16,10 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 
     private void UpdateEntities(DbContext? context)
     {
-        if (context == null) return;
+        if (context is null) return;
+
+        var now = DateTime.UtcNow;
+        var userId = userContext.UserId;
 
         var entries = context.ChangeTracker.Entries<IAuditableEntity>();
 
@@ -26,23 +27,50 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.CreatedBy = "SYSTEM";
+                entry.Entity.CreatedAt = now;
+                entry.Entity.CreatedBy = userId;
             }
 
             if (entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
             {
-                entry.Entity.UpdatedAt = DateTime.UtcNow;
-                entry.Entity.UpdatedBy = "SYSTEM";
+                entry.Entity.UpdatedAt = now;
+                entry.Entity.UpdatedBy = userId;
             }
+
+            HandleSoftDeleteIfNeeded(entry, now, userId);
+        }
+    }
+
+    private void HandleSoftDeleteIfNeeded(EntityEntry<IAuditableEntity> entry, DateTime now, Guid userId)
+    {
+        var type = entry.Entity.GetType();
+        var statusProp = type.GetProperty("Status");
+
+        if (statusProp is null || !statusProp.PropertyType.IsEnum)
+            return;
+
+        // Check if enum has [SoftDeletableStatus] attribute
+        var isSoftDeletable = statusProp.PropertyType.GetCustomAttribute<SoftDeletableStatusAttribute>() is not null;
+        if (!isSoftDeletable)
+            return;
+
+        var statusValue = statusProp.GetValue(entry.Entity);
+        if (statusValue is null)
+            return;
+
+        var statusName = Enum.GetName(statusProp.PropertyType, statusValue);
+        if (statusName == "Deleted")
+        {
+            entry.Entity.DeletedAt ??= now;
+            entry.Entity.DeletedBy ??= userId;
         }
     }
 }
+
 public static class EntityEntryExtensions
 {
     public static bool HasChangedOwnedEntities(this EntityEntry entry) =>
         entry.References.Any(r =>
-            r.TargetEntry != null &&
-            r.TargetEntry.Metadata.IsOwned() &&
-            (r.TargetEntry.State == EntityState.Added || r.TargetEntry.State == EntityState.Modified));
+            r.TargetEntry is { State: EntityState.Added or EntityState.Modified } &&
+            r.TargetEntry.Metadata.IsOwned());
 }

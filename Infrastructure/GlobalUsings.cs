@@ -1,0 +1,9 @@
+﻿global using MediatR;
+global using System.Reflection;
+global using System.Security.Claims;
+global using Application.Common.Interfaces.Authentication;
+global using Application.Common.Interfaces;
+global using Domain.Common;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Http;

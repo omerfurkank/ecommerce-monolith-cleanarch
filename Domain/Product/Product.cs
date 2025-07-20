@@ -1,9 +1,8 @@
-﻿using Domain.Common;
-using Domain.Product.Enums;
+﻿using Domain.Product.Enums;
 using Domain.Product.Events;
 using Domain.Product.ValueObjects;
 
-public class Product : AuditableEntity<Guid>, IAggregateRoot
+public class Product : AuditableEntity, IAggregateRoot
 {
     public string Name { get; private set; } = default!;
     public string? Description { get; private set; }
@@ -31,7 +30,7 @@ public class Product : AuditableEntity<Guid>, IAggregateRoot
             Id = Guid.NewGuid(),
             Name = name,
             Description = description,
-            Image = image,
+            Image = finalImage,
             Price = price,
             BrandId = brandId,
             CategoryId = categoryId,
@@ -44,21 +43,13 @@ public class Product : AuditableEntity<Guid>, IAggregateRoot
         return product;
     }
 
-    public void Update(string name, string? description, ProductImage image, Money price, Guid brandId, Guid categoryId)
+    public void ChangeName(string name)
     {
         ValidateName(name);
-        ValidatePrice(price);
-
-        Name = name;
-        Description = description;
-        Image = image;
-        BrandId = brandId;
-        CategoryId = categoryId;
-
-        if (Price != price)
+        if (Name != name)
         {
-            Price = price;
-            AddDomainEvent(new ProductPriceChangedEvent(Id, Price.Value));
+            Name = name;
+            //AddDomainEvent(new ProductNameChangedEvent(Id, name));
         }
     }
 
